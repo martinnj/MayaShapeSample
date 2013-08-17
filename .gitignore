@@ -2,12 +2,38 @@
 *.slo
 *.lo
 *.o
+*.bin
+*.obj
 
 # Compiled Dynamic libraries
 *.so
 *.dylib
+*.mll
 
 # Compiled Static libraries
 *.lai
 *.la
 *.a
+
+# Compiled executables
+*.exe
+
+# VS project and solution related stuff
+*.vcxproj
+*.filters
+*.lastbuildstate
+*.sdf
+*.opensdf
+*.sln
+*.suo
+*.exp
+*.ilk
+*.pdb
+
+# Random gunk from cmake and other stuff
+*CMakeFiles*
+*.cmake
+CMakeCache.txt
+*.log
+*.tlog
+*.cache
