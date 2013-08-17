@@ -21,6 +21,7 @@ SET(SOURCE_FILES
   README.md
   pluginMain.cpp
   simpleShapeIterator.cpp
+  simpleShapeUI.cpp
   ${HEADERS}
 )
 
