@@ -15,8 +15,11 @@ SET(MAYA_LIBRARY_DIR "${MAYA_DIRECTORY}/lib")
 
 # Add the source files here
 SET(SOURCE_FILES
+  README.md
   pluginMain.cpp
-  pluginMain.h
+  simpleShape.h
+  simpleShapeUI.h
+  simpleShapeiterator.h
 )
 
 source_group("" FILES ${SOURCE_FILES})
