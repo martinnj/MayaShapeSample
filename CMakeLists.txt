@@ -3,11 +3,11 @@
 
 # We want at least some arbitrary cmake version for this and a project name
 cmake_minimum_required (VERSION 2.6)
-project (MayaPluginSample)
+project (MayaShapeSample)
 
 
 # Set the name of the plugin
-SET(MAYA_PLUGIN_NAME "MayaPluginSample")
+SET(MAYA_PLUGIN_NAME "MayaShapeSample")
 # Set the path to the Maya installation whose libraries and headers you want to compile against.
 SET(MAYA_DIRECTORY "C:/Program Files/Autodesk/Maya2013")
 SET(MAYA_HEADERS_DIR "${MAYA_DIRECTORY}/include")
@@ -15,8 +15,8 @@ SET(MAYA_LIBRARY_DIR "${MAYA_DIRECTORY}/lib")
 
 # Add the source files here
 SET(SOURCE_FILES
-  pluginCmd.cpp
-  pluginCmd.h
+  pluginMain.cpp
+  pluginMain.h
 )
 
 source_group("" FILES ${SOURCE_FILES})
