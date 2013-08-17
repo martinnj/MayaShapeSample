@@ -13,18 +13,20 @@ SET(MAYA_DIRECTORY "C:/Program Files/Autodesk/Maya2013")
 SET(MAYA_HEADERS_DIR "${MAYA_DIRECTORY}/include")
 SET(MAYA_LIBRARY_DIR "${MAYA_DIRECTORY}/lib")
 
+SET(HEADERS_DIR "${PROJECT_SOURCE_DIR}/include")
+FILE(GLOB HEADERS "${HEADERS_DIR}/*.h")
+
 # Add the source files here
 SET(SOURCE_FILES
   README.md
   pluginMain.cpp
-  simpleShape.h
-  simpleShapeUI.h
-  simpleShapeiterator.h
+  ${HEADERS}
 )
 
 source_group("" FILES ${SOURCE_FILES})
 
 INCLUDE_DIRECTORIES(
+  ${HEADERS_DIR}
   ${MAYA_HEADERS_DIR}
   ${MAYA_LIBRARY_DIR}
   ${Boost_INCLUDE_DIR}

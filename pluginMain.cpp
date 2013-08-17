@@ -6,9 +6,9 @@
 #include <maya/MFnPlugin.h>
 
 // Include the headers for the shape.
-#include "simpleShape.h"
-#include "simpleShapeUI.h"
-#include "simpleShapeIterator.h"
+#include <simpleShape.h>
+#include <simpleShapeUI.h>
+#include <simpleShapeIterator.h>
 
 
 // Gets called when the plugin is loaded into Maya.
