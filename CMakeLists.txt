@@ -20,6 +20,7 @@ FILE(GLOB HEADERS "${HEADERS_DIR}/*.h")
 SET(SOURCE_FILES
   README.md
   pluginMain.cpp
+  simpleShapeIterator.cpp
   ${HEADERS}
 )
 
