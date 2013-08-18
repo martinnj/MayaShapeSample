@@ -170,5 +170,60 @@ void simpleShapeUI::getDrawRequests( const MDrawInfo & info,
             break;
     }
 
-    // Add draw requests for components 221!!
+    // Add draw requests for components
+    if ( !objectAndActiveOnly ) 
+    {
+        // Inactive components
+        if ( (appearance == M3dView::kPoints) ||
+             (appearance == M3dView::kHilite) )
+        {
+            MDrawRequest vertexRequest = info.getPrototype( *this );
+            vertexRequest.setDrawData ( data );
+            vertexRequest.setToken( kDrawVertices );
+            vertexRequest.setColor( DORMANT_VERTEX_COLOR, M3dView::kActiveColors);
+            queue.add( vertexRequest );
+        }
+
+        // Active components
+        if ( surfaceShape()->hasActiveComponents() )
+        {
+            MDrawRequest activeVertexRequest = info.getPrototype( *this );
+            activeVertexRequest.setDrawData ( data );
+            activeVertexRequest.setToken( kDrawVertices );
+            activeVertexRequest.setColor( ACTIVE_VERTEX_COLOR, M3dView::kActiveColors);
+
+            MObjectArray clist = surfaceShape()->activeComponents();
+            MObject vertexComponent = clist[0];
+            activeVertexRequest.setComponent( vertexComponent );
+            queue.add( activeVertexRequest );
+        }
+    }
+}
+
+void simpleShapeUI::draw( const MDrawRequest & request, M3dView & view ) const
+// Main (openGL) draw routine
+{
+    // Extract token from request, this shows what should be drawn
+    int token = request.token();
+    switch ( token )
+    {
+    case kDrawWireframe:
+    case kDrawWireframeOnShaded:
+    case kDrawVertices:
+        drawVertices( request, view );
+        break;
+    case kDrawSmoothShaded:
+        break; // Not implemented, can be done as exercise.
+    case kDrawFlatShaded:
+        break; // Not implemented, can be done as exercise.
+    default:
+        break;
+    }
+}
+
+bool simpleShapeUI::select( MSelectInfo &selectInfo, MSelectionList &selectionList,
+                            MPointArray &worldSpacePts ) const
+// Main selection routine
+{
+    // return from 306
 }
