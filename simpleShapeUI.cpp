@@ -222,8 +222,136 @@ void simpleShapeUI::draw( const MDrawRequest & request, M3dView & view ) const
 }
 
 bool simpleShapeUI::select( MSelectInfo &selectInfo, MSelectionList &selectionList,
-                            MPointArray &worldSpacePts ) const
+                            MPointArray &worldSpaceSelectPts ) const
 // Main selection routine
 {
-    // return from 306
+    bool selected = false;
+	bool componentSelected = false;
+	bool hilited = false;
+
+	hilited = (selectInfo.displayStatus() == M3dView::kHilite);
+	if ( hilited )
+	{
+		componentSelected = selectVertices( selectInfo, selectionList, worldSpaceSelectPts );
+		selected = selected || componentSelected;
+	}
+
+	if ( !selected )
+	{
+		// NOTE: If the geometry has an intersect routine it should
+		// be called here with the selection ray to determine if the
+		// the object was selected.
+
+		selected = true;
+		MSelectionMask priorityMask( MSelectionMask::kSelectNurbsSurfaces );
+		MSelectionList item;
+		item.add( selectInfo.selectPath() );
+		MPoint xformedPt;
+		if ( selectInfo.singleSelection() )
+		{
+			MPoint center = surfaceShape()->boundingBox().center();
+			xformedPt = center;
+			xformedPt *= selectInfo.selectPath().inclusiveMatrix();
+		}
+
+		selectInfo.addSelection( item, xformedPt, selectionList, worldSpaceSelectPts, priorityMask, false );
+
+	}
+
+	return selected;
+}
+
+
+/*
+ * Helper routines
+ */
+
+void simpleShapeUI::drawVertices( const MDrawRequest & request, M3dView & view ) const
+// Component ( vertex ) drawing routine.
+{
+	MDrawData data = request.drawData();
+	MVectorArray * geom = (MVectorArray*)data.geometry();
+
+	view.beginGL();
+
+	// Query current state so it can be restored
+	bool lightingWasOn = glIsEnabled( GL_LIGHTING ) ? true : false;
+	if ( lightingWasOn )
+	{
+		glDisable( GL_LIGHTING );
+	}
+	float lastPointSize;
+	glGetFloatv ( GL_POINT_SIZE, &lastPointSize );
+
+	// Set the point size of the vertices.
+	glPointSize( POINT_SIZE );
+
+	// If there is a component specified by the draw request
+	// then loop over comp (using an MFnComponent class) and draw the
+	// active vertices, otherwise draw all vertices.
+	MObject comp = request.component();
+	if ( ! comp.isNull() )
+	{
+		MFnSingleIndexedComponent fnComponent ( comp );
+		for ( int i=0; i < fnComponent.elementCount(); i++ )
+		{
+			int index = fnComponent.element( i );
+			glBegin( GL_POINTS );
+			MVector& point = (*geom)[index];
+			glVertex3f( (float) point[0],
+				        (float) point[1],
+						(float) point[2] );
+			glEnd();
+
+			char annotation[32];
+			sprintf( annotation, "%d", index );
+			view.drawText( annotation, point );
+		}
+	}
+	else {
+		for ( unsigned int i=0; i<geom->length(); i++)
+		{
+			glBegin( GL_POINTS );
+			MVector point = (*geom)[i];
+			glVertex3f( (float) point[0],
+				        (float) point[1],
+						(float) point[2] );
+			glEnd();
+		}
+	}
+
+	// Restore the state we saved earlier.
+	if ( lightingWasOn ) {
+		glEnable( GL_LIGHTING );
+	}
+	glPointSize( lastPointSize );
+
+	view.endGL();
+}
+
+bool simpleShapeUI::selectVertices( MSelectInfo &selectInfo,
+								    MSelectionList &selectionList,
+									MPointArray &worldSpaceSelectPts ) const
+// Vertex selection
+{
+	bool selected = false;
+	M3dView view = selectInfo.view();
+
+	MPoint xformedPoint;
+	MPoint currentPoint;
+	MPoint selectionPoint;
+	double z,previousZ = 0.0;
+	int    closestPointVertexIndex = -1;
+
+	const MDagPath & path = selectInfo.multiPath();
+
+	// Create a component that will store the selected vertices.
+	MFnSingleIndexedComponent fnComponent;
+	MObject surfaceComponent = fnComponent.create( MFn::kMeshVertComponent );
+	int vertexIndex;
+
+	// if the user did a single mouse click and we find > 1 selection
+	// we will use the alignmentMatrix to find out which is the closest
+	// Return from 455
+
 }
