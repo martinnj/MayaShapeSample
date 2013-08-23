@@ -44,6 +44,8 @@ SET(LIBRARIES
   OpenMaya.lib
   OpenMayaAnim.lib
   OpenMayaUI.lib
+  opengl32.lib
+  glu32.lib
 )
 
 # Definitions that is needed in order to compile the Maya headers.
