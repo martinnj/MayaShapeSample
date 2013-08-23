@@ -352,6 +352,85 @@ bool simpleShapeUI::selectVertices( MSelectInfo &selectInfo,
 
 	// if the user did a single mouse click and we find > 1 selection
 	// we will use the alignmentMatrix to find out which is the closest
-	// Return from 455
+	
+	MMatrix alignmentMatrix;
+	MPoint singlePoint;
+	bool singleSelection = selectInfo.singleSelection();
+	if ( singleSelection )
+	{
+		alignmentMatrix = selectInfo.getAlignmentMatrix();
+	}
 
+	// Get the geometry information.
+	simpleShape* shape = (simpleShape*) surfaceShape();
+	MVectorArray* geomPtr = shape->getControlPoints();
+	MVectorArray& geom = *geomPtr;
+
+	// Loop through all vertices of the mesh to check if they are within
+	// the selection area.
+	int numVertices = geom.length();
+	for ( vertexIndex=0; vertexIndex<numVertices; vertexIndex++ )
+	{
+		const MVector& point = geom[vertexIndex];
+		
+		// Set openGL's rendermode to select and store selected items in a pick buffer.
+		view.beginSelect();
+		glBegin( GL_POINTS );
+		glVertex3f( (float)point[0],
+			        (float)point[1],
+					(float)point[2]);
+		glEnd();
+
+		if ( view.endSelect() > 0)
+		{
+			selected = true;
+
+			if ( singleSelection )
+			{
+				xformedPoint = currentPoint;
+				xformedPoint.homogenize();
+				xformedPoint*=alignmentMatrix;
+				z = xformedPoint.z;
+
+				if ( closestPointVertexIndex < 0 || z > previousZ )
+				{
+					closestPointVertexIndex = vertexIndex;
+					singlePoint = currentPoint;
+					previousZ = z;
+				}
+			}
+			else
+			{
+				// Multible selection, store all elements
+				fnComponent.addElement( vertexIndex );
+			}
+		}
+	}
+
+	// If single selection, insert closest point into the array
+	if ( selected && selectInfo.singleSelection() )
+	{
+		fnComponent.addElement( closestPointVertexIndex );
+		// Need to get world space coordinates for the vertex
+		selectionPoint = singlePoint;
+		selectionPoint *= path.inclusiveMatrix();
+	}
+
+	// Add the selected component to the selection list.
+	if ( selected )
+	{
+		MSelectionList selectionItem;
+		selectionItem.add( path, surfaceComponent );
+
+		MSelectionMask mask( MSelectionMask::kSelectComponentsMask );
+		selectInfo.addSelection(
+			selectionItem,
+			selectionPoint,
+			selectionList,
+			worldSpaceSelectPts,
+			mask,
+			true );
+	}
+
+	return selected;
 }
