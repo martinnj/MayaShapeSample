@@ -1,63 +1,27 @@
-# To create 64bit projects, add "Win64" to end of generator, like so:
-# cmake CMakeLists.txt -G "Visual Studio 11 Win64"
+#-----------------------------------------------------------------------------
+IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+  MESSAGE(
+    FATAL_ERROR 
+    "We only allow out-of-source build."
+    )
+ENDIF()
 
-# We want at least some arbitrary cmake version for this and a project name
-cmake_minimum_required (VERSION 2.6)
-project (MayaShapeSample)
+IF(COMMAND cmake_policy)
+  CMAKE_POLICY(SET CMP0003 NEW)
+ENDIF(COMMAND cmake_policy)
+
+PROJECT(MAYA_PLUGIN_SAMPLE)
+
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
+SET(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+
+IF (MSVC)
+  ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
+  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+ELSE (MSVC)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+ENDIF(MSVC)
 
 
-# Set the name of the plugin
-SET(MAYA_PLUGIN_NAME "MayaShapeSample")
-# Set the path to the Maya installation whose libraries and headers you want to compile against.
-SET(MAYA_DIRECTORY "C:/Program Files/Autodesk/Maya2013")
-SET(MAYA_HEADERS_DIR "${MAYA_DIRECTORY}/include")
-SET(MAYA_LIBRARY_DIR "${MAYA_DIRECTORY}/lib")
-
-SET(HEADERS_DIR "${PROJECT_SOURCE_DIR}/include")
-FILE(GLOB HEADERS "${HEADERS_DIR}/*.h")
-
-# Add the source files here
-SET(SOURCE_FILES
-  README.md
-  pluginMain.cpp
-  simpleShapeIterator.cpp
-  simpleShapeUI.cpp
-  ${HEADERS}
-)
-
-source_group("" FILES ${SOURCE_FILES})
-
-INCLUDE_DIRECTORIES(
-  ${HEADERS_DIR}
-  ${MAYA_HEADERS_DIR}
-  ${MAYA_LIBRARY_DIR}
-  ${Boost_INCLUDE_DIR}
-)
-LINK_DIRECTORIES(
-  ${MAYA_LIBRARY_DIR}
-  ${MAYA_HEADERS_DIR}
-)
-
-# When we use libraries from Maya they should be added here
-SET(LIBRARIES
-  Foundation.lib
-  OpenMaya.lib
-  OpenMayaAnim.lib
-  OpenMayaUI.lib
-  opengl32.lib
-  glu32.lib
-)
-
-# Definitions that is needed in order to compile the Maya headers.
-SET(MAYA_DEFINITIONS _AFXDLL _MBCS NT_PLUGIN REQUIRE_IOSTREAM _BOOL)
-
-ADD_LIBRARY(${MAYA_PLUGIN_NAME} SHARED ${SOURCE_FILES})
-TARGET_LINK_LIBRARIES(${MAYA_PLUGIN_NAME} ${LIBRARIES})
-
-SET_TARGET_PROPERTIES(${MAYA_PLUGIN_NAME} PROPERTIES COMPILE_DEFINITIONS "${MAYA_DEFINITIONS}")
-SET_TARGET_PROPERTIES(${MAYA_PLUGIN_NAME} PROPERTIES OUTPUT_NAME "${MAYA_PLUGIN_NAME}")
-
-# The suffix might need to be changed if on Linux, note sure yet.
-SET_TARGET_PROPERTIES(${MAYA_PLUGIN_NAME} PROPERTIES SUFFIX ".mll")
-SET_TARGET_PROPERTIES(${MAYA_PLUGIN_NAME} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-SET_TARGET_PROPERTIES(${MAYA_PLUGIN_NAME} PROPERTIES LINK_FLAGS "/export:initializePlugin /export:uninitializePlugin")
+ADD_SUBDIRECTORY(SAMPLE)
